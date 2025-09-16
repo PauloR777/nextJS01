@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import useUserMembers from "../../teacher/member/store";
 
 // Note: schema/types moved inside the client component to avoid using DOM globals (FileList) during SSR
@@ -23,13 +24,19 @@ export default function TodoApp() {
     major: z.string().optional(),
     university: z.string().optional(),
     // file inputs (profile single, others multiple)
-    photo: z.any().optional(),
-    activities: z.any().optional(),
-    awards: z.any().optional(),
-    works: z.any().optional(),
+    photo: z.instanceof(FileList).optional(),
+    activities: z.instanceof(FileList).optional(),
+    awards: z.instanceof(FileList).optional(),
+    works: z.instanceof(FileList).optional(),
   });
 
-  type Task = z.infer<typeof TaskSchema> & { profilePhoto?: string; activities?: string[]; awards?: string[]; works?: string[] };
+  type FormValues = z.infer<typeof TaskSchema>;
+  type Task = FormValues & { 
+    profilePhoto?: string; 
+    activities?: string[]; 
+    awards?: string[]; 
+    works?: string[]; 
+  };
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [preview, setPreview] = useState<string | null>(null);
@@ -43,7 +50,7 @@ export default function TodoApp() {
     reset,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<Task>({
+  } = useForm<FormValues>({
     resolver: zodResolver(TaskSchema),
     defaultValues: { 
       firstName: "", lastName: "", address: "", phone: "", school: "", gpa: undefined, skills: "", reason: "", major: "", university: "",
@@ -87,7 +94,7 @@ export default function TodoApp() {
     }
   }, [worksFiles]);
 
-  const onAdd = (data: Task) => {
+  const onAdd = (data: FormValues) => {
     const photoFiles = data.photo;
     const activitiesFiles = data.activities;
     const awardsFiles = data.awards;
@@ -227,7 +234,7 @@ export default function TodoApp() {
             {errors.photo && <div className="text-sm text-red-600">{(errors.photo as any)?.message}</div>}
             {preview && (
               <div className="mt-2">
-                <img src={preview} alt="preview" className="w-32 h-32 object-cover rounded shadow-sm" />
+                <Image src={preview} alt="preview" width={128} height={128} className="w-32 h-32 object-cover rounded shadow-sm" unoptimized />
               </div>
             )}
           </div>
@@ -249,7 +256,15 @@ export default function TodoApp() {
             {activitiesPreview.length > 0 && (
               <div className="mt-2 grid grid-cols-3 gap-2">
                 {activitiesPreview.map((url, idx) => (
-                  <img key={idx} src={url} alt={`Activity ${idx + 1}`} className="w-full h-24 object-cover rounded shadow-sm" />
+                  <Image 
+                    key={idx} 
+                    src={url} 
+                    alt={`Activity ${idx + 1}`} 
+                    width={96} 
+                    height={96} 
+                    className="w-full h-24 object-cover rounded shadow-sm"
+                    unoptimized 
+                  />
                 ))}
               </div>
             )}
@@ -272,7 +287,15 @@ export default function TodoApp() {
             {awardsPreview.length > 0 && (
               <div className="mt-2 grid grid-cols-3 gap-2">
                 {awardsPreview.map((url, idx) => (
-                  <img key={idx} src={url} alt={`Award ${idx + 1}`} className="w-full h-24 object-cover rounded shadow-sm" />
+                  <Image 
+                    key={idx} 
+                    src={url} 
+                    alt={`Award ${idx + 1}`} 
+                    width={96} 
+                    height={96} 
+                    className="w-full h-24 object-cover rounded shadow-sm"
+                    unoptimized 
+                  />
                 ))}
               </div>
             )}
@@ -295,7 +318,15 @@ export default function TodoApp() {
             {worksPreview.length > 0 && (
               <div className="mt-2 grid grid-cols-3 gap-2">
                 {worksPreview.map((url, idx) => (
-                  <img key={idx} src={url} alt={`Work ${idx + 1}`} className="w-full h-24 object-cover rounded shadow-sm" />
+                  <Image 
+                    key={idx} 
+                    src={url} 
+                    alt={`Work ${idx + 1}`} 
+                    width={96} 
+                    height={96} 
+                    className="w-full h-24 object-cover rounded shadow-sm"
+                    unoptimized 
+                  />
                 ))}
               </div>
             )}

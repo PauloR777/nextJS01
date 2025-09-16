@@ -23,9 +23,9 @@ type State = {
   addMember: (m: UserMember) => void;
 };
 
-export const useUserMembers = create<State>((set: any) => ({
+export const useUserMembers = create<State>((set) => ({
   members: [],
-  addMember: (m: UserMember) => set((s: State) => ({ members: [...s.members, m] })),
+  addMember: (m: UserMember) => set((state) => ({ members: [...state.members, m] })),
 }));
 
 export default useUserMembers;
