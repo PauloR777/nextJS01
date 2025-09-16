@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Navbar } from "./componet/Navbar";
+import Footer from "./componet/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,9 +27,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 text-slate-900 min-h-screen flex flex-col`}
       >
-        {children}
+        <header className="bg-white shadow-sm">
+          <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-slate-800">Computer Science - Portfolio</h1>
+            <Navbar />
+          </div>
+        </header>
+
+        <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-8">
+          {children}
+        </main>
+
+        <Footer txt="© 2025 ComputerScience MJU." />
+
       </body>
     </html>
   );
