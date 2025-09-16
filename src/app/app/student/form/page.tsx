@@ -31,14 +31,25 @@ export default function TodoApp() {
   });
 
   type FormValues = z.infer<typeof TaskSchema>;
-  type Task = FormValues & { 
-    profilePhoto?: string; 
-    activities?: string[]; 
-    awards?: string[]; 
-    works?: string[]; 
-  };
+  interface SavedTask {
+    id?: string;
+    firstName: string;
+    lastName: string;
+    address?: string;
+    phone: string;
+    school: string;
+    gpa: number;
+    skills?: string;
+    reason?: string;
+    major?: string;
+    university?: string;
+    profilePhoto?: string;
+    activities: string[];
+    awards: string[];
+    works: string[];
+  }
 
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<SavedTask[]>([]);
   const [preview, setPreview] = useState<string | null>(null);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const addMember = useUserMembers((s) => s.addMember);
@@ -100,12 +111,23 @@ export default function TodoApp() {
     const awardsFiles = data.awards;
     const worksFiles = data.works;
 
-  const profilePhoto = photoFiles && photoFiles.length > 0 ? URL.createObjectURL((photoFiles as FileList)[0]) : (editIndex !== null ? tasks[editIndex].profilePhoto : undefined);
-  const activities = activitiesFiles ? Array.from(activitiesFiles as FileList).map((f: File) => URL.createObjectURL(f)) : (editIndex !== null ? tasks[editIndex].activities || [] : []);
-  const awards = awardsFiles ? Array.from(awardsFiles as FileList).map((f: File) => URL.createObjectURL(f)) : (editIndex !== null ? tasks[editIndex].awards || [] : []);
-  const works = worksFiles ? Array.from(worksFiles as FileList).map((f: File) => URL.createObjectURL(f)) : (editIndex !== null ? tasks[editIndex].works || [] : []);
+    const profilePhoto = photoFiles && photoFiles.length > 0 
+      ? URL.createObjectURL(photoFiles[0]) 
+      : (editIndex !== null ? tasks[editIndex].profilePhoto : undefined);
 
-    const newTask = {
+    const activities = activitiesFiles 
+      ? Array.from(activitiesFiles).map(f => URL.createObjectURL(f))
+      : (editIndex !== null ? tasks[editIndex].activities : []);
+
+    const awards = awardsFiles 
+      ? Array.from(awardsFiles).map(f => URL.createObjectURL(f))
+      : (editIndex !== null ? tasks[editIndex].awards : []);
+
+    const works = worksFiles 
+      ? Array.from(worksFiles).map(f => URL.createObjectURL(f))
+      : (editIndex !== null ? tasks[editIndex].works : []);
+
+    const newTask: SavedTask = {
       firstName: data.firstName,
       lastName: data.lastName,
       address: data.address,
@@ -117,9 +139,9 @@ export default function TodoApp() {
       major: data.major,
       university: data.university,
       profilePhoto,
-      activities,
-      awards,
-      works,
+      activities: activities,
+      awards: awards,
+      works: works,
     };
 
     if (editIndex !== null) {
