@@ -24,10 +24,12 @@ export default function TodoApp() {
     major: z.string().optional(),
     university: z.string().optional(),
     // file inputs (profile single, others multiple)
-    photo: z.instanceof(FileList).optional(),
-    activities: z.instanceof(FileList).optional(),
-    awards: z.instanceof(FileList).optional(),
-    works: z.instanceof(FileList).optional(),
+    // Avoid referencing browser globals (FileList) at module eval time which breaks
+    // prerendering on the server. Use unknown here and cast to FileList in client code.
+    photo: z.unknown().optional(),
+    activities: z.unknown().optional(),
+    awards: z.unknown().optional(),
+    works: z.unknown().optional(),
   });
 
   type FormValues = z.infer<typeof TaskSchema>;
@@ -69,11 +71,17 @@ export default function TodoApp() {
     mode: "onSubmit",
   });
 
-  // watch photo input เพื่อทำ preview
-  const photoFile = watch("photo");
-  const activitiesFiles = watch("activities");
-  const awardsFiles = watch("awards");
-  const worksFiles = watch("works");
+  // watch file inputs (watch returns unknown because schema uses z.unknown)
+  const photoWatch = watch("photo");
+  const activitiesWatch = watch("activities");
+  const awardsWatch = watch("awards");
+  const worksWatch = watch("works");
+
+  // narrow types to FileList | undefined for client-side use
+  const photoFile = photoWatch as FileList | undefined;
+  const activitiesFiles = activitiesWatch as FileList | undefined;
+  const awardsFiles = awardsWatch as FileList | undefined;
+  const worksFiles = worksWatch as FileList | undefined;
 
   useEffect(() => {
     if (photoFile && photoFile.length > 0) {
@@ -89,42 +97,44 @@ export default function TodoApp() {
 
   useEffect(() => {
     if (activitiesFiles && activitiesFiles.length > 0) {
-      setActivitiesPreview(Array.from(activitiesFiles as FileList).map((f: File) => URL.createObjectURL(f)));
+      setActivitiesPreview(Array.from(activitiesFiles).map((f: File) => URL.createObjectURL(f)));
     }
   }, [activitiesFiles]);
 
   useEffect(() => {
     if (awardsFiles && awardsFiles.length > 0) {
-      setAwardsPreview(Array.from(awardsFiles as FileList).map((f: File) => URL.createObjectURL(f)));
+      setAwardsPreview(Array.from(awardsFiles).map((f: File) => URL.createObjectURL(f)));
     }
   }, [awardsFiles]);
 
   useEffect(() => {
     if (worksFiles && worksFiles.length > 0) {
-      setWorksPreview(Array.from(worksFiles as FileList).map((f: File) => URL.createObjectURL(f)));
+      setWorksPreview(Array.from(worksFiles).map((f: File) => URL.createObjectURL(f)));
     }
   }, [worksFiles]);
 
   const onAdd = (data: FormValues) => {
-    const photoFiles = data.photo;
-    const activitiesFiles = data.activities;
-    const awardsFiles = data.awards;
-    const worksFiles = data.works;
+    // form schema uses z.unknown for files to avoid SSR FileList reference.
+    // Narrow to FileList | undefined here in client code.
+    const photoFiles = data.photo as FileList | undefined;
+    const activitiesFiles = data.activities as FileList | undefined;
+    const awardsFiles = data.awards as FileList | undefined;
+    const worksFiles = data.works as FileList | undefined;
 
-    const profilePhoto = photoFiles && photoFiles.length > 0 
-      ? URL.createObjectURL(photoFiles[0]) 
+    const profilePhoto = photoFiles && photoFiles.length > 0
+      ? URL.createObjectURL(photoFiles[0])
       : (editIndex !== null ? tasks[editIndex].profilePhoto : undefined);
 
-    const activities = activitiesFiles 
-      ? Array.from(activitiesFiles).map(f => URL.createObjectURL(f))
+    const activities = activitiesFiles && activitiesFiles.length > 0
+      ? Array.from(activitiesFiles).map((f: File) => URL.createObjectURL(f))
       : (editIndex !== null ? tasks[editIndex].activities : []);
 
-    const awards = awardsFiles 
-      ? Array.from(awardsFiles).map(f => URL.createObjectURL(f))
+    const awards = awardsFiles && awardsFiles.length > 0
+      ? Array.from(awardsFiles).map((f: File) => URL.createObjectURL(f))
       : (editIndex !== null ? tasks[editIndex].awards : []);
 
-    const works = worksFiles 
-      ? Array.from(worksFiles).map(f => URL.createObjectURL(f))
+    const works = worksFiles && worksFiles.length > 0
+      ? Array.from(worksFiles).map((f: File) => URL.createObjectURL(f))
       : (editIndex !== null ? tasks[editIndex].works : []);
 
     const newTask: SavedTask = {
