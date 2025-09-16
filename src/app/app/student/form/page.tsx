@@ -140,16 +140,7 @@ export default function TodoApp() {
     setPreview(null);
   };
 
-  const onDelete = (index: number) => {
-    setTasks(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const onEdit = (index: number) => {
-    const task = tasks[index];
-    reset(task); // load ข้อมูลเดิมไปฟอร์ม
-  setPreview(task.profilePhoto || null);
-    setEditIndex(index);
-  };
+  // Delete and edit functionality removed as they're not currently used
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
@@ -231,7 +222,7 @@ export default function TodoApp() {
               {...register("photo")} 
               accept="image/*" 
             />
-            {errors.photo && <div className="text-sm text-red-600">{(errors.photo as any)?.message}</div>}
+            {errors.photo && <div className="text-sm text-red-600">{errors.photo.message?.toString()}</div>}
             {preview && (
               <div className="mt-2">
                 <Image src={preview} alt="preview" width={128} height={128} className="w-32 h-32 object-cover rounded shadow-sm" unoptimized />

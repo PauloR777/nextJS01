@@ -1,6 +1,7 @@
 "use client";
 import useUserMembers from "../store";
 import Link from "next/link";
+import Image from "next/image";
 import { use } from "react";
 
 type Props = { params: Promise<{ id: string }> };
@@ -31,7 +32,14 @@ export default function MemberDetail({ params }: Props) {
       <div className="flex flex-col md:flex-row gap-6">
         {member.profilePhoto && (
           <div className="w-full md:w-1/3">
-            <img src={member.profilePhoto} alt="รูปโปรไฟล์" className="w-full rounded-lg shadow-sm" />
+            <Image
+              src={member.profilePhoto}
+              alt="รูปโปรไฟล์"
+              width={300}
+              height={400}
+              className="w-full rounded-lg shadow-sm"
+              unoptimized
+            />
           </div>
         )}
         
@@ -84,7 +92,15 @@ export default function MemberDetail({ params }: Props) {
           <h2 className="text-black text-xl font-semibold mb-4">กิจกรรมที่เคยทำ</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {member.activities.map((url, idx) => (
-              <img key={idx} src={url} alt={`Activity ${idx + 1}`} className="w-full h-48 object-cover rounded-lg shadow-sm" />
+              <Image
+                key={idx}
+                src={url}
+                alt={`Activity ${idx + 1}`}
+                width={200}
+                height={192}
+                className="w-full h-48 object-cover rounded-lg shadow-sm"
+                unoptimized
+              />
             ))}
           </div>
         </div>
@@ -96,7 +112,15 @@ export default function MemberDetail({ params }: Props) {
           <h2 className="text-black text-xl font-semibold mb-4">รางวัลที่เคยได้รับ</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {member.awards.map((url, idx) => (
-              <img key={idx} src={url} alt={`Award ${idx + 1}`} className="w-full h-48 object-cover rounded-lg shadow-sm" />
+              <Image
+                key={idx}
+                src={url}
+                alt={`Award ${idx + 1}`}
+                width={200}
+                height={192}
+                className="w-full h-48 object-cover rounded-lg shadow-sm"
+                unoptimized
+              />
             ))}
           </div>
         </div>
@@ -108,7 +132,15 @@ export default function MemberDetail({ params }: Props) {
           <h2 className="text-black text-xl font-semibold mb-4">ผลงานอื่นๆ</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {member.works.map((url, idx) => (
-              <img key={idx} src={url} alt={`Work ${idx + 1}`} className="w-full h-48 object-cover rounded-lg shadow-sm" />
+              <Image
+                key={idx}
+                src={url}
+                alt={`Work ${idx + 1}`}
+                width={200}
+                height={192}
+                className="w-full h-48 object-cover rounded-lg shadow-sm"
+                unoptimized
+              />
             ))}
           </div>
         </div>
